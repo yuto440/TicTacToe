@@ -1,0 +1,16 @@
+# Pythonが自動生成するキャッシュフォルダを無視
+__pycache__/
+*.pyc
+
+# 自分が作った仮想環境フォルダを無視
+.venv/
+venv/
+env/
+
+# OS（Mac）が自動生成する隠しファイルを無視
+.DS_Store
+
+# VS Codeの設定フォルダ（個人設定など）を無視
+.vscode/
+
+requirements.txt
