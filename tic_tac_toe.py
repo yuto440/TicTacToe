@@ -1,4 +1,5 @@
-
+import pygame
+import sys
 
 class TicTacToe:
     #クラス変数として定義
@@ -67,6 +68,16 @@ class GameController:
         self.tictactoe = TicTacToe()
         self.display_mode = display_mode #コマンドに表示するかpygameでグラフィックを表示するか、表示なしか
 
+        if self.display_mode == "graphic": #graphicモードの時pygameを初期化
+            pygame.init()
+            self.screen_size = 300
+            self.screen = pygame.display.set_mode((self.screen_size, self.screen_size))
+            pygame.display.set_caption("TicTacToe")
+
+            self.BG_COLOR = (255, 255, 255)
+
+
+
     def display(self):
         #コマンド表示
         if self.display_mode == "console":
@@ -75,6 +86,14 @@ class GameController:
                 print(f"{i} " + "|".join(row))
                 if i < 2:
                     print("  -------")
+        elif self.display_mode == "graphic":
+            self._draw_graphic_board()
+
+
+    def _draw_graphic_board(self): #pygameでの表示を行う
+        self.screen.fill(self.BG_COLOR)
+
+        pygame.display.update()
 
     def get_action(self):
         while True:
@@ -92,6 +111,11 @@ class GameController:
                 print("ValueError")
 
     def play_game(self):
+        if self.display_mode == "console":
+            self._play_console()
+
+
+    def _play_console(self): #コンソールモードのゲームループ
         print("===Game start!!===")
 
         turn = 0
@@ -115,6 +139,7 @@ class GameController:
             print("Draw!!")
 
         print("===Game end===")
+
 
 if __name__ == "__main__":
     gm = GameController(display_mode="console")
