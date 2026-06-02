@@ -113,6 +113,8 @@ class GameController:
     def play_game(self):
         if self.display_mode == "console":
             self._play_console()
+        elif self.display_mode == "graphic":
+            self._play_graphic()
 
 
     def _play_console(self): #コンソールモードのゲームループ
@@ -140,7 +142,20 @@ class GameController:
 
         print("===Game end===")
 
+    def _play_graphic(self):
+        running = True
+
+        while running:
+            self.display()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+        pygame.quit()
+        sys.exit()
+
 
 if __name__ == "__main__":
-    gm = GameController(display_mode="console")
+    gm = GameController(display_mode="graphic")
     gm.play_game()
