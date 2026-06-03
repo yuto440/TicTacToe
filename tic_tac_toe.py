@@ -74,7 +74,19 @@ class GameController:
             self.screen = pygame.display.set_mode((self.screen_size, self.screen_size))
             pygame.display.set_caption("TicTacToe")
 
+            self.board_size = 200
+            #ボードの座標
+            self.board_x = 50
+            self.board_y = 50
+            self.board_surface = pygame.Surface((self.board_size, self.board_size)) #ボードを独立したサーフェスに
+
+            self.cell_size = self.board_size // 3
+
             self.BG_COLOR = (255, 255, 255)
+            self.BOARD_COLOR = (230,230,150)
+            self.LINE_COLOR = (0, 0, 0)
+            self.O_COLOR = (0, 0, 255)
+            self.X_COLOR = (255, 0, 0)
 
 
 
@@ -92,10 +104,35 @@ class GameController:
 
     def _draw_graphic_board(self): #pygameでの表示を行う
         self.screen.fill(self.BG_COLOR)
+        self.board_surface.fill(self.BOARD_COLOR)
 
+        #ボードの格子を引く
+        for i in range(1, 3):
+            pos = i * (self.cell_size)
+            pygame.draw.line(self.board_surface, self.LINE_COLOR, (0, pos), (self.board_size, pos), 2)
+            pygame.draw.line(self.board_surface, self.LINE_COLOR, (pos, 0), (pos, self.board_size), 2)
+
+        #マルバツの表示
+        for row in range(len(self.tictactoe.board)):
+            for col in range(len(self.tictactoe.board[row])):
+                cell = self.tictactoe.board[row][col]
+                cell_left = self.cell_size * row
+                cell_top = self.cell_size * col
+                center_x = cell_left + self.cell_size // 2
+                center_y = cell_top + self.cell_size // 2
+                margine = self.board_size // 30
+
+                if cell == self.tictactoe.PLAYER_O:
+                    pygame.draw.circle(self.board_surface, self.O_COLOR, (center_x, center_y), self.cell_size // 2 - margine, 4)
+                if cell == self.tictactoe.PLAYER_X:
+                    pygame.draw.line(self.board_surface, self.X_COLOR, (cell_left + margine, cell_top + margine), (cell_left + self.cell_size - margine, cell_top + self.cell_size - margine), 4)
+                    pygame.draw.line(self.board_surface, self.X_COLOR, (cell_left + self.cell_size - margine, cell_top + margine), (cell_left + margine, cell_top + self.cell_size - margine), 4)
+
+        self.screen.blit(self.board_surface, (self.board_x, self.board_y))
         pygame.display.update()
+        
 
-    def get_action(self):
+    def console_get_action(self):
         while True:
             try:
                 print(f"Current player is {self.tictactoe.current_player}")
@@ -110,6 +147,21 @@ class GameController:
             except ValueError:
                 print("ValueError")
 
+    def graphic_get_action(self, mouse_pos):
+        mx, my = mouse_pos
+
+        local_x = mx - self.board_x
+        local_y = my - self.board_y
+
+        if 0 <= local_x < self.board_size and 0 <= local_y < self.board_size:
+            row = local_x // self.cell_size
+            col = local_y // self.cell_size
+
+            action = (row, col)
+            return action
+        return None
+
+
     def play_game(self):
         if self.display_mode == "console":
             self._play_console()
@@ -123,7 +175,7 @@ class GameController:
         turn = 0
         while turn < 9:
             self.display()
-            row, col = self.get_action()
+            row, col = self.console_get_action()
             if self.tictactoe.make_move(row, col):
                 turn += 1
             
@@ -147,10 +199,17 @@ class GameController:
 
         while running:
             self.display()
+            
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        mouse_pos = event.pos
+                        action = self.graphic_get_action(mouse_pos)
+                        if action is not None:
+                            self.tictactoe.make_move(action[0], action[1])
 
         pygame.quit()
         sys.exit()
