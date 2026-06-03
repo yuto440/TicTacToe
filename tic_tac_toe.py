@@ -83,8 +83,8 @@ class GameController:
             self.cell_size = self.board_size // 3
 
             self.TEXT_COLOR = (0, 255, 0)
-            self.font = pygame.font.Font(None, 55)
-            self.text = self.font.render("TEST", True, self.TEXT_COLOR)
+            self.font = pygame.font.Font(None, 25)
+            
             self.text_x = 0
             self.text_y = 0
 
@@ -135,7 +135,18 @@ class GameController:
                     pygame.draw.line(self.board_surface, self.X_COLOR, (cell_left + margine, cell_top + margine), (cell_left + self.cell_size - margine, cell_top + self.cell_size - margine), 4)
                     pygame.draw.line(self.board_surface, self.X_COLOR, (cell_left + self.cell_size - margine, cell_top + margine), (cell_left + margine, cell_top + self.cell_size - margine), 4)
 
-        self.screen.blit(self.text, (self.text_x, self.text_y))
+        #テキストの表示
+        winner = self.tictactoe.check_winner()
+        if winner == None:
+            text = f"Current player is {self.tictactoe.current_player}"
+        elif winner == self.tictactoe.PLAYER_O:
+            text = "O wins!!"
+        elif winner == self.tictactoe.PLAYER_X:
+            text = "X wins!!"
+
+        text_surface = self.font.render(text, True, self.TEXT_COLOR)
+        
+        self.screen.blit(text_surface, (self.text_x, self.text_y))
         self.screen.blit(self.board_surface, (self.board_x, self.board_y))
         pygame.display.update()
         
