@@ -82,11 +82,18 @@ class GameController:
 
             self.cell_size = self.board_size // 3
 
+            self.TEXT_COLOR = (0, 255, 0)
+            self.font = pygame.font.Font(None, 55)
+            self.text = self.font.render("TEST", True, self.TEXT_COLOR)
+            self.text_x = 0
+            self.text_y = 0
+
             self.BG_COLOR = (255, 255, 255)
             self.BOARD_COLOR = (230,230,150)
             self.LINE_COLOR = (0, 0, 0)
             self.O_COLOR = (0, 0, 255)
             self.X_COLOR = (255, 0, 0)
+            
 
 
 
@@ -128,6 +135,7 @@ class GameController:
                     pygame.draw.line(self.board_surface, self.X_COLOR, (cell_left + margine, cell_top + margine), (cell_left + self.cell_size - margine, cell_top + self.cell_size - margine), 4)
                     pygame.draw.line(self.board_surface, self.X_COLOR, (cell_left + self.cell_size - margine, cell_top + margine), (cell_left + margine, cell_top + self.cell_size - margine), 4)
 
+        self.screen.blit(self.text, (self.text_x, self.text_y))
         self.screen.blit(self.board_surface, (self.board_x, self.board_y))
         pygame.display.update()
         
