@@ -7,9 +7,16 @@ class TicTacToe:
     PLAYER_O = "o"
     PLAYER_X = "x"
 
+    DRAW = "draw"
+
+    PLAYING = "playing"
+    GAME_OVER = "game over"
+
     def __init__(self):
         self.board = [[self.EMPTY_CELL for _ in range(3)] for _ in range(3)] #空っぽのボードを作成
         self.current_player = self.PLAYER_O #最初のプレイヤーはo
+        self.turn = 0
+        self.state = self.PLAYING
 
     #プレーヤーの行動を起こす。入力された行動が可能ならボードにo,xを置き、Trueを返す。不可能ならFalse
     def make_move(self, row, col):
@@ -17,6 +24,7 @@ class TicTacToe:
             return False
         if self.board[row][col] == self.EMPTY_CELL:
             self.board[row][col] = self.current_player
+            self.turn += 1
 
             if self.current_player == self.PLAYER_O:
                 self.current_player = self.PLAYER_X
@@ -40,6 +48,7 @@ class TicTacToe:
         for row in self.board:
             winner = check_line(row)
             if winner:
+                self.state = self.GAME_OVER
                 return winner
         
         # 縦軸の判定
@@ -47,20 +56,25 @@ class TicTacToe:
             column = [self.board[row_idx][col_idx] for row_idx in range(3)] #内包表記
             winner = check_line(column)
             if winner:
+                self.state = self.GAME_OVER
                 return winner
             
         # 斜めの判定
         diagonal1 = [self.board[i][i] for i in range(3)]
         winner = check_line(diagonal1)
         if winner:
+            self.state = self.GAME_OVER
             return winner
         
         diagonal2 = [self.board[i][2-i] for i in range(3)]
         winner = check_line(diagonal2)
         if winner:
+            self.state = self.GAME_OVER
             return winner
         
-        return None
+        if self.turn == 9:
+            self.state = self.GAME_OVER
+            return self.DRAW
     
 
 class GameController:
@@ -143,10 +157,14 @@ class GameController:
             text = "O wins!!"
         elif winner == self.tictactoe.PLAYER_X:
             text = "X wins!!"
+        elif winner == self.tictactoe.DRAW:
+            text = "Draw!!"
 
         text_surface = self.font.render(text, True, self.TEXT_COLOR)
-        
-        self.screen.blit(text_surface, (self.text_x, self.text_y))
+        text_rect = text_surface.get_rect()
+        text_rect.center = (self.screen_size // 2, 10)
+
+        self.screen.blit(text_surface, text_rect)
         self.screen.blit(self.board_surface, (self.board_x, self.board_y))
         pygame.display.update()
         
@@ -167,6 +185,8 @@ class GameController:
                 print("ValueError")
 
     def graphic_get_action(self, mouse_pos):
+        if self.tictactoe.state is not self.tictactoe.PLAYING:
+            return
         mx, my = mouse_pos
 
         local_x = mx - self.board_x
