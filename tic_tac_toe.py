@@ -102,6 +102,12 @@ class GameController:
             self.text_x = 0
             self.text_y = 0
 
+            #リセットボタン
+            self.new_game_button = self.font.render("New game", True, self.TEXT_COLOR)
+            self.new_game_rect = self.new_game_button.get_rect()
+            self.new_game_rect.center = (self.screen_size // 2, 270)
+
+
             self.BG_COLOR = (255, 255, 255)
             self.BOARD_COLOR = (230,230,150)
             self.LINE_COLOR = (0, 0, 0)
@@ -162,11 +168,17 @@ class GameController:
 
         text_surface = self.font.render(text, True, self.TEXT_COLOR)
         text_rect = text_surface.get_rect()
-        text_rect.center = (self.screen_size // 2, 10)
+        text_rect.center = (self.screen_size // 2, 30)
+
+
 
         self.screen.blit(text_surface, text_rect)
+        self.screen.blit(self.new_game_button, self.new_game_rect)
         self.screen.blit(self.board_surface, (self.board_x, self.board_y))
         pygame.display.update()
+
+    def reset(self):
+        self.tictactoe = TicTacToe()
         
 
     def console_get_action(self):
@@ -185,19 +197,21 @@ class GameController:
                 print("ValueError")
 
     def graphic_get_action(self, mouse_pos):
-        if self.tictactoe.state is not self.tictactoe.PLAYING:
-            return
         mx, my = mouse_pos
+        if self.tictactoe.state is self.tictactoe.PLAYING:
+            local_x = mx - self.board_x
+            local_y = my - self.board_y
 
-        local_x = mx - self.board_x
-        local_y = my - self.board_y
+            if 0 <= local_x < self.board_size and 0 <= local_y < self.board_size:
+                row = local_x // self.cell_size
+                col = local_y // self.cell_size
 
-        if 0 <= local_x < self.board_size and 0 <= local_y < self.board_size:
-            row = local_x // self.cell_size
-            col = local_y // self.cell_size
-
-            action = (row, col)
-            return action
+                action = (row, col)
+                return action
+        
+        if self.new_game_rect.collidepoint(mouse_pos):
+            self.reset()
+        
         return None
 
 
